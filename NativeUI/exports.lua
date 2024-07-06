@@ -17,7 +17,7 @@ exports("CreateMenu", function(name, colour, width, height)
     menuCount = menuCount + 1
     return menuCount
 end)
-exports("MenuPool.Add", function(menuPool, menu)
+exports("MenuPool:Add", function(menuPool, menu)
     pools[menuPool]:Add(menus[menu])
 end)
 exports("MenuPool:ProcessMenus", function (menuPool)
