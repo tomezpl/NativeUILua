@@ -8,6 +8,8 @@ menus = {}
 menuCount = 0
 menuItems = {}
 menuItemCount = 0
+windows = {}
+windowCount = 0
 
 function handleIndex(handle, kind)
     return tonumber(string.sub(handle, string.len(kind) + 1))
@@ -28,15 +30,36 @@ exports('_setEventListener', function(target, event, eventName)
         targetTable = menuItems
     end
 
-    if event == 'OnListChange' and targetType ~= nil and targetTable ~= nil then 
-        targetTable[handleIndex(target, targetType)].OnListChange = function(sender, item, index)
-            local itemIndex = -1
-            for i=1,menuItemCount do
-                if menuItems[i] == item then
-                    itemIndex = i
+    if targetType ~= nil and targetTable ~= nil then
+        if (event == 'OnListChange' or event == 'OnSliderChange') then 
+            targetTable[handleIndex(target, targetType)][event] = function(sender, item, index)
+                local itemIndex = -1
+                for i=1,menuItemCount do
+                    if menuItems[i] == item then
+                        itemIndex = i
+                    end
                 end
+                TriggerEvent(eventName, sender, "menuItem" .. itemIndex, index)
             end
-            TriggerEvent(eventName, sender, "menuItem" .. itemIndex, index)
+        end
+
+        if event == 'OnMenuChanged' then
+            targetTable[handleIndex(target, targetType)][event] = function(parent, menu, ...)
+                local menuIndex = -1
+                for i=1,menuCount do
+                    if menus[i] == menu then
+                        menuIndex = i
+                    end
+                end
+
+                TriggerEvent(eventName, parent, "menu" .. menuIndex, ...)
+            end
+        end
+
+        if event == 'OnMenuClosed' then
+            targetTable[handleIndex(target, targetType)][event] = function(...)
+                TriggerEvent(eventName, ...)
+            end
         end
     end
 end)
@@ -57,11 +80,27 @@ exports("CreateListItem", function(name, options, defaultIndex, description)
     menuItemCount = menuItemCount + 1
     return "menuItem" .. menuItemCount
 end)
+exports("CreateSliderItem", function(...)
+    table.insert(menuItems, NativeUI.CreateSliderItem(...))
+    menuItemCount = menuItemCount + 1
+    return "menuItem" .. menuItemCount
+end)
+exports("CreateHeritageWindow", function(...)
+    table.insert(windows, NativeUI.CreateHeritageWindow(...))
+    windowCount = windowCount + 1
+    return "window" .. windowCount
+end)
+
 exports("MenuPool:Add", function(menuPool, menu)
     pools[handleIndex(menuPool, "menuPool")]:Add(menus[handleIndex(menu, "menu")])
 end)
 exports("MenuPool:ProcessMenus", function (menuPool)
     pools[handleIndex(menuPool, "menuPool")]:ProcessMenus()
+end)
+exports("MenuPool:AddSubMenu", function (menuPool, parentMenu, ...)
+    table.insert(menus, pools[handleIndex(menuPool, "menuPool")]:AddSubMenu(menus[handleIndex(parentMenu, "menu")], ...))
+    menuCount = menuCount + 1
+    return "menu" .. menuCount
 end)
 
 exports("Menu:Visible", function (menu, visible)
@@ -69,4 +108,15 @@ exports("Menu:Visible", function (menu, visible)
 end)
 exports("Menu:AddItem", function(menu, menuItem)
     menus[handleIndex(menu, "menu")]:AddItem(menuItems[handleIndex(menuItem, "menuItem")])
+end)
+exports("Menu:AddWindow", function(menu, window) 
+    menus[handleIndex(menu, "menu")]:AddWindow(windows[handleIndex(window, "window")])
+end)
+
+exports("Window:Index", function(window, ...)
+    windows[handleIndex(window, "window")]:Index(...)
+end)
+
+exports("MenuItem:Index", function(menuItem, ...)
+    menuItems[handleIndex(menuItem, "menuItem")]:Index(...)
 end)
