@@ -36,7 +36,7 @@ exports('_setEventListener', function(target, event, eventName)
                     itemIndex = i
                 end
             end
-            TriggerEvent(eventName, sender, itemIndex, index)
+            TriggerEvent(eventName, sender, "menuItem" .. itemIndex, index)
         end
     end
 end)
