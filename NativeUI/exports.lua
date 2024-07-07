@@ -39,12 +39,13 @@ exports('_setEventListener', function(target, event, eventName)
                         itemIndex = i
                     end
                 end
-                TriggerEvent(eventName, sender, "menuItem" .. itemIndex, index)
+                -- We're sending nil instead of sender because it takes an enormous amount of time to serialize
+                TriggerEvent(eventName, nil, "menuItem" .. itemIndex, index)
             end
         end
 
         if event == 'OnMenuChanged' then
-            targetTable[handleIndex(target, targetType)][event] = function(parent, menu, ...)
+            targetTable[handleIndex(target, targetType)][event] = function(parent, menu, forward) 
                 local menuIndex = -1
                 for i=1,menuCount do
                     if menus[i] == menu then
@@ -52,13 +53,13 @@ exports('_setEventListener', function(target, event, eventName)
                     end
                 end
 
-                TriggerEvent(eventName, parent, "menu" .. menuIndex, ...)
+                TriggerEvent(eventName, nil, "menu" .. menuIndex, forward)
             end
         end
 
         if event == 'OnMenuClosed' then
-            targetTable[handleIndex(target, targetType)][event] = function(...)
-                TriggerEvent(eventName, ...)
+            targetTable[handleIndex(target, targetType)][event] = function()
+                TriggerEvent(eventName)
             end
         end
     end
@@ -113,10 +114,10 @@ exports("Menu:AddWindow", function(menu, window)
     menus[handleIndex(menu, "menu")]:AddWindow(windows[handleIndex(window, "window")])
 end)
 
-exports("Window:Index", function(window, ...)
-    windows[handleIndex(window, "window")]:Index(...)
+exports("Window:Index", function(window, index1, index2)
+    windows[handleIndex(window, "window")]:Index(index1, index2)
 end)
 
-exports("MenuItem:Index", function(menuItem, ...)
-    menuItems[handleIndex(menuItem, "menuItem")]:Index(...)
+exports("MenuItem:Index", function(menuItem, index)
+    menuItems[handleIndex(menuItem, "menuItem")]:Index(index)
 end)
