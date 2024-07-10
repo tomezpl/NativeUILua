@@ -22,16 +22,16 @@ exports('_setEventListener', function(target, event, eventName)
     if string.find(target, "menuPool") ~= nil then
         targetType = "menuPool"
         targetTable = pools
-    elseif string.find(target, "menu") ~= nil then
-        targetType = "menu"
-        targetTable = menus
     elseif string.find(target, "menuItem") ~= nil then
         targetType = "menuItem"
         targetTable = menuItems
+    elseif string.find(target, "menu") ~= nil then
+        targetType = "menu"
+        targetTable = menus
     end
 
     if targetType ~= nil and targetTable ~= nil then
-        if (event == 'OnListChange' or event == 'OnSliderChange') then 
+        if (event == 'OnListChange' or string.find(event, 'OnSliderChange') ~= nil) then 
             targetTable[handleIndex(target, targetType)][event] = function(sender, item, index)
                 local itemIndex = -1
                 for i=1,menuItemCount do
