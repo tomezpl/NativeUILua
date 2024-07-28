@@ -10,6 +10,8 @@ menuItems = {}
 menuItemCount = 0
 windows = {}
 windowCount = 0
+panels = {}
+panelCount = 0
 
 function handleIndex(handle, kind)
     return tonumber(string.sub(handle, string.len(kind) + 1))
@@ -31,7 +33,7 @@ exports('_setEventListener', function(target, event, eventName)
     end
 
     if targetType ~= nil and targetTable ~= nil then
-        if (event == 'OnListChange' or string.find(event, 'OnSliderChange') ~= nil) then 
+        if (string.find(event, 'OnListChange') ~= nil or string.find(event, 'OnSliderChange') ~= nil) then 
             targetTable[handleIndex(target, targetType)][event] = function(sender, item, index)
                 local itemIndex = -1
                 for i=1,menuItemCount do
@@ -91,6 +93,11 @@ exports("CreateHeritageWindow", function(...)
     windowCount = windowCount + 1
     return "window" .. windowCount
 end)
+exports("CreateColourPanel", function(...)
+    table.insert(panels, NativeUI.CreateColourPanel(...))
+    panelCount = panelCount + 1
+    return "panel" .. panelCount
+end)
 
 exports("MenuPool:Add", function(menuPool, menu)
     pools[handleIndex(menuPool, "menuPool")]:Add(menus[handleIndex(menu, "menu")])
@@ -119,5 +126,34 @@ exports("Window:Index", function(window, index1, index2)
 end)
 
 exports("MenuItem:Index", function(menuItem, index)
-    menuItems[handleIndex(menuItem, "menuItem")]:Index(index)
+    return menuItems[handleIndex(menuItem, "menuItem")]:Index(index)
+end)
+
+exports("MenuListItem:Index", function(menuListItem, index)
+    return menuItems[handleIndex(menuListItem, "menuItem")]:Index(index)
+end)
+exports("MenuListItem:IndexToItem", function(menuListItem, index)
+    local item = menuItems[handleIndex(menuListItem, "menuItem")]
+    for i = 1,menuItemCount do 
+        if menuItems[i] == item then 
+            return "menuItem" .. i
+        end
+    end
+end)
+exports("MenuListItem:AddPanel", function(menuListItem, panel)
+    menuItems[handleIndex(menuListItem, "menuItem")]:AddPanel(panels[handleIndex(panel, "panel")])
+end)
+exports("MenuListItem:getPanelValue", function(menuListItem, panelIndex)
+    local panel = menuItems[handleIndex(menuListItem, "menuItem")].Panels[panelIndex]
+    if panel ~= nil then
+        return panel:CurrentSelection()
+    end
+
+    return nil
+end)
+exports("MenuListItem:getProp", function(menuListItem, propName)
+    return menuItems[handleIndex(menuListItem, "menuItem")][propName]
+end)
+exports("MenuListItem:setProp", function(menuListItem, propName, propValue)
+    menuItems[handleIndex(menuListItem, "menuItem")][propName] = propValue
 end)
