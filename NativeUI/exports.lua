@@ -98,6 +98,11 @@ exports("CreateColourPanel", function(...)
     panelCount = panelCount + 1
     return "panel" .. panelCount
 end)
+exports("CreatePercentagePanel", function(...)
+    table.insert(panels, NativeUI.CreatePercentagePanel(...))
+    panelCount = panelCount + 1
+    return "panel" .. panelCount
+end)
 
 exports("MenuPool:Add", function(menuPool, menu)
     pools[handleIndex(menuPool, "menuPool")]:Add(menus[handleIndex(menu, "menu")])
@@ -143,13 +148,20 @@ end)
 exports("MenuListItem:AddPanel", function(menuListItem, panel)
     menuItems[handleIndex(menuListItem, "menuItem")]:AddPanel(panels[handleIndex(panel, "panel")])
 end)
+exports("MenuListItem:RemovePanelAt", function(menuListItem, panelIndex)
+    menuItems[handleIndex(menuListItem, "menuItem")]:RemovePanelAt(panelIndex)
+end)
 exports("MenuListItem:getPanelValue", function(menuListItem, panelIndex)
     local panel = menuItems[handleIndex(menuListItem, "menuItem")].Panels[panelIndex]
-    if panel ~= nil then
+    if panel ~= nil and panel.CurrentSelection ~= nil then
         return panel:CurrentSelection()
     end
 
     return nil
+end)
+exports("MenuListItem:doesPanelExist", function(menuListItem, panelIndex)
+    local panel = menuItems[handleIndex(menuListItem, "menuItem")].Panels[panelIndex]
+    return panel ~= nil
 end)
 exports("MenuListItem:getProp", function(menuListItem, propName)
     return menuItems[handleIndex(menuListItem, "menuItem")][propName]
