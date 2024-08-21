@@ -64,6 +64,13 @@ exports('_setEventListener', function(target, event, eventName)
                 TriggerEvent(eventName)
             end
         end
+
+        if event == 'Activated' then
+            targetTable[handleIndex(target, targetType)][event] = function()
+                -- Not sending any params as they're not needed atm
+                TriggerEvent(eventName)
+            end
+        end
     end
 end)
 
@@ -77,6 +84,11 @@ exports("CreateMenu", function(name, colour, width, height)
     table.insert(menus, NativeUI.CreateMenu(name, colour, width, height))
     menuCount = menuCount + 1
     return "menu" .. menuCount
+end)
+exports("CreateItem", function(...)
+    table.insert(menuItems, NativeUI.CreateItem(...))
+    menuItemCount = menuItemCount + 1
+    return "menuItem" .. menuItemCount
 end)
 exports("CreateListItem", function(name, options, defaultIndex, description)
     table.insert(menuItems, NativeUI.CreateListItem(name, options, defaultIndex, description))
