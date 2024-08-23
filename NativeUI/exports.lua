@@ -65,6 +65,12 @@ exports('_setEventListener', function(target, event, eventName)
             end
         end
 
+        if event == 'OnItemSelect' then
+            targetTable[handleIndex(target, targetType)][event] = function(sender, item, index)
+                TriggerEvent(eventName, nil, nil, index)
+            end
+        end
+
         if event == 'Activated' then
             targetTable[handleIndex(target, targetType)][event] = function()
                 -- Not sending any params as they're not needed atm
