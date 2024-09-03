@@ -2245,6 +2245,7 @@ function UIMenuPercentagePanel.New(MinText, MaxText)
     _UIMenuPercentagePanel = {
         Data = {
             Enabled = true,
+            Percentage = 1.0
         },
         Background = Sprite.New("commonmenu", "gradient_bgd", 0, 0, 431, 76),
         ActiveBar = UIResRectangle.New(0, 0, 413, 10, 245, 245, 245, 255),
@@ -2292,6 +2293,7 @@ end
 function UIMenuPercentagePanel:Percentage(Value)
     if tonumber(Value) then
         local Percent = ((Value < 0.0) and 0.0) or ((Value > 1.0) and 1.0 or Value)
+        -- self.Data.Percentage = Percent
         self.ActiveBar:Size(self.BackgroundBar.Width * Percent, self.ActiveBar.Height)
     else
         local SafeZone = {X = 0, Y = 0}
@@ -2306,6 +2308,11 @@ end
 
 function UIMenuPercentagePanel:UpdateParent(Percentage)
     local _, ParentType = self.ParentItem()
+    if Percentage ~= nil then
+        print('changing percentage!!!')
+        print(Percentage)
+        -- self.Data.Percentage = Percentage
+    end
     if ParentType == "UIMenuListItem" then
         local PanelItemIndex = self.ParentItem:FindPanelItem()
         if PanelItemIndex then
@@ -2348,6 +2355,13 @@ function UIMenuPercentagePanel:Functions()
                     while IsDisabledControlPressed(0, 24) and IsMouseInBounds(self.BackgroundBar.X + SafeZone.X, self.BackgroundBar.Y - 4 + SafeZone.Y, self.BackgroundBar.Width, self.BackgroundBar.Height + 8) do
                         Citizen.Wait(0)
                         local Progress = (math.round(GetControlNormal(0, 239) * 1920) - SafeZone.X) - self.ActiveBar.X
+                        self.Data.Percentage = Progress/self.BackgroundBar.Width
+                        if self.Data.Percentage < 0 then
+                            self.Data.Percentage = 0.0
+                        end
+                        if self.Data.Percentage > 1 then
+                            self.Data.Percentage = 1.0
+                        end
                         self.ActiveBar:Size(((Progress >= 0 and Progress <= 413) and Progress or ((Progress < 0) and 0 or 413)), self.ActiveBar.Height)
                     end
                     StopSound(self.Audio.Id)
@@ -3852,3 +3866,5 @@ end
 function NativeUI.CreateText(Text, X, Y, Scale, R, G, B, A, Font, Alignment, DropShadow, Outline, WordWrap)
     return UIResText.New(Text, X, Y, Scale, R, G, B, A, Font, Alignment, DropShadow, Outline, WordWrap)
 end
+
+print('MOTHERUFCKREWRS1111111111111')

@@ -3,9 +3,11 @@ UIMenuPercentagePanel.__index = UIMenuPercentagePanel
 UIMenuPercentagePanel.__call = function() return "UIMenuPanel", "UIMenuPercentagePanel" end
 
 function UIMenuPercentagePanel.New(MinText, MaxText)
+	print('creating percentage panel ' .. MinText .. '-' .. MaxText)
 	_UIMenuPercentagePanel = {
 		Data = {
 			Enabled = true,
+			Percentage = 1.0
 		},
 		Background = Sprite.New("commonmenu", "gradient_bgd", 0, 0, 431, 76),
 		ActiveBar = UIResRectangle.New(0, 0, 413, 10, 245, 245, 245, 255),
@@ -31,6 +33,7 @@ function UIMenuPercentagePanel:SetParentItem(Item) -- required
 end
 
 function UIMenuPercentagePanel:Enabled(Enabled)
+	print('called enabled on percentage panel with ' .. Enabled)
 	if type(Enabled) == "boolean" then
 		self.Data.Enabled = Enabled
 	else
@@ -66,6 +69,10 @@ function UIMenuPercentagePanel:Percentage(Value)
 end
 
 function UIMenuPercentagePanel:UpdateParent(Percentage)
+	print('UpdateParent(' .. tostring(Percentage) .. ')')
+	if Percentage ~= nil then
+		self.Data.Percentage = Percentage
+	end
 	local _, ParentType = self.ParentItem()
 	if ParentType == "UIMenuListItem" then
 		local PanelItemIndex = self.ParentItem:FindPanelItem()
@@ -101,6 +108,7 @@ function UIMenuPercentagePanel:Functions()
 
     if IsMouseInBounds(self.BackgroundBar.X + SafeZone.X, self.BackgroundBar.Y - 4 + SafeZone.Y, self.BackgroundBar.Width, self.BackgroundBar.Height + 8) then
         if IsDisabledControlJustPressed(0, 24) then
+			print('Pressed')
             if not self.Pressed then
                 self.Pressed = true
                 Citizen.CreateThread(function()

@@ -80,9 +80,20 @@ exports('_setEventListener', function(target, event, eventName)
     end
 end)
 
+Citizen.CreateThread(function()
+    while true do 
+        Citizen.Wait(0)
+        for i = 1,poolCount do
+            if pools[i] ~= nil then
+                pools[i]:ProcessMenus()
+            end
+        end
+    end
+end)
 
 exports("CreatePool", function()
-    table.insert(pools, NativeUI.CreatePool())
+    local newPool = NativeUI.CreatePool()
+    table.insert(pools, newPool)
     poolCount = poolCount + 1
     return "menuPool" .. poolCount
 end)
@@ -172,13 +183,43 @@ end)
 exports("MenuListItem:RemovePanelAt", function(menuListItem, panelIndex)
     menuItems[handleIndex(menuListItem, "menuItem")]:RemovePanelAt(panelIndex)
 end)
-exports("MenuListItem:getPanelValue", function(menuListItem, panelIndex)
-    local panel = menuItems[handleIndex(menuListItem, "menuItem")].Panels[panelIndex]
-    if panel ~= nil and panel.CurrentSelection ~= nil then
-        return panel:CurrentSelection()
+exports("MenuListItem:getPanelValue", function(panel)
+    print('getPanelValue')
+    local panelObj = panels[handleIndex(panel, "panel")]
+    if panelObj ~= nil and panelObj.CurrentSelection ~= nil then
+        print('colour')
+        return panelObj:CurrentSelection()
+    end
+    if panelObj ~= nil and panelObj.Data ~= nil and panelObj.Data.Percentage ~= nil then
+        print('percentage2')
+        print(tostring(panelObj.Data.Percentage))
+        if panelObj.ParentItem ~= nil then
+            local PanelItemIndex = panelObj.ParentItem:FindPanelItem(panelObj)
+            -- if PanelItemIndex then 
+                -- print("panel " .. PanelItemIndex)
+                -- return panelObj.ParentItem.Items[PanelItemIndex].Value[panelObj.ParentItem:FindPanelIndex(panelObj)]
+            -- end
+        end
+        return panelObj.Data.Percentage
     end
 
     return nil
+end)
+exports("MenuListItem:setPanelValue", function(panel, value)
+    local panelObj = panels[handleIndex(panel, "panel")]
+    if panelObj ~= nil and panelObj.CurrentSelection ~= nil then
+        panelObj:CurrentSelection(value, false)
+    elseif panelObj ~= nil and panelObj.Percentage ~= nil then
+        panelObj.Data.Percentage = Percentage
+        panelObj:UpdateParent(value, false)
+    end
+end)
+exports("MenuListItem:setPanelEnabled", function(menuListItem, panelIndex, enabled)
+    print("calling menuItems[" .. handleIndex(menuListItem, "menuItem") .. "].Panels[" .. panelIndex .. "]:Enabled(" .. tostring(enabled) .. ")")
+    local panel = menuItems[handleIndex(menuListItem, "menuItem")].Panels[panelIndex]
+    if panel ~= nil then
+        panel:Enabled(enabled)
+    end
 end)
 exports("MenuListItem:doesPanelExist", function(menuListItem, panelIndex)
     local panel = menuItems[handleIndex(menuListItem, "menuItem")].Panels[panelIndex]
