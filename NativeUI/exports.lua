@@ -210,7 +210,7 @@ exports("MenuListItem:setPanelValue", function(panel, value)
     if panelObj ~= nil and panelObj.CurrentSelection ~= nil then
         panelObj:CurrentSelection(value, false)
     elseif panelObj ~= nil and panelObj.Percentage ~= nil then
-        panelObj.Data.Percentage = Percentage
+        panelObj.Data.Percentage = value 
         -- Sync the active bar visually as well
         panelObj.ActiveBar:Size(413 * ((value >= 0 and value <= 413) and value or ((value < 0) and 0 or 1)), panelObj.ActiveBar.Height)
         panelObj:UpdateParent(value, false)
