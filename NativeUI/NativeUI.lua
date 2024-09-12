@@ -1783,14 +1783,41 @@ end
 --]]
 
 function UIMenuHeritageWindow.New(Mum, Dad)
+    print(Mum .. type(Mum))
+    print(Dad .. type(Dad))
+    local maleMum = false
+    local femaleDad = false
+    local mumsCount = 21
+    local dadsCount = 23
+    local dadTxnPrefix = "male_"
+    local mumTxnPrefix = "female_"
+
+    if type(Mum) == "string" and Mum:sub(1,1) == "-" then
+        Mum = tonumber(Mum) * -1
+        maleMum = true
+        mumsCount = 23
+        mumTxnPrefix = "male_"
+    end
+    if type(Dad) == "string" and Dad:sub(1,1) == "-" then
+        Dad = tonumber(Dad) * -1
+        femaleDad = true
+        dadsCount = 21
+        dadTxnPrefix = "female_"
+    end
+
+    print("converted")
+
+    print(Mum .. type(Mum))
+    print(Dad .. type(Dad))
+
     if not tonumber(Mum) then Mum = 0 end
-    if not (Mum >= 0 and Mum <= 21) then Mum = 0 end
+    if not (Mum >= 0 and Mum <= mumsCount) then Mum = 0 end
     if not tonumber(Dad) then Dad = 0 end
-    if not (Dad >= 0 and Dad <= 23) then Dad = 0 end
+    if not (Dad >= 0 and Dad <= dadsCount) then Dad = 0 end
     _UIMenuHeritageWindow = {
         Background = Sprite.New("pause_menu_pages_char_mom_dad", "mumdadbg", 0, 0, 431, 228), -- Background is required, must be a sprite or a rectangle.
-        MumSprite = Sprite.New("char_creator_portraits", ((Mum < 21) and "female_"..Mum or "special_female_"..(tonumber(string.sub(Mum, 2, 2)) - 1)), 0, 0, 228, 228),
-        DadSprite = Sprite.New("char_creator_portraits", ((Dad < 21) and "male_"..Dad or "special_male_"..(tonumber(string.sub(Dad, 2, 2)) - 1)), 0, 0, 228, 228),
+        MumSprite = Sprite.New("char_creator_portraits", ((Mum < 21) and mumTxnPrefix..Mum or "special_"..mumTxnPrefix..(tonumber(string.sub(Mum, 2, 2)) - 1)), 0, 0, 228, 228),
+        DadSprite = Sprite.New("char_creator_portraits", ((Dad < 21) and dadTxnPrefix..Dad or "special_"..dadTxnPrefix..(tonumber(string.sub(Dad, 2, 2)) - 1)), 0, 0, 228, 228),
         Mum = Mum,
         Dad = Dad,
         _Offset = {X = 0, Y = 0}, -- required
@@ -1829,16 +1856,38 @@ function UIMenuHeritageWindow:Position(Y) -- required
 end
 
 function UIMenuHeritageWindow:Index(Mum, Dad)
+    print(Mum .. type(Mum))
+    print(Dad .. type(Dad))
+    local maleMum = false
+    local femaleDad = false
+    local mumsCount = 21
+    local dadsCount = 23
+    local dadTxnPrefix = "male_"
+    local mumTxnPrefix = "female_"
+
+    if type(Mum) == "string" and Mum:sub(1,1) == "-" then
+        Mum = tonumber(Mum) * -1
+        maleMum = true
+        mumsCount = 23
+        mumTxnPrefix = "male_"
+    end
+    if type(Dad) == "string" and Dad:sub(1,1) == "-" then
+        Dad = tonumber(Dad) * -1
+        femaleDad = true
+        dadsCount = 21
+        dadTxnPrefix = "female_"
+    end
+
     if not tonumber(Mum) then Mum = self.Mum end
-    if not (Mum >= 0 and Mum <= 21) then Mum = self.Mum end
+    if not (Mum >= 0 and Mum <= mumsCount) then Mum = self.Mum end
     if not tonumber(Dad) then Dad = self.Dad end
-    if not (Dad >= 0 and Dad <= 23) then Dad = self.Dad end
+    if not (Dad >= 0 and Dad <= dadsCount) then Dad = self.Dad end
 
     self.Mum = Mum
     self.Dad = Dad
 
-    self.MumSprite.TxtName = ((self.Mum < 21) and "female_"..self.Mum or "special_female_"..(tonumber(string.sub(Mum, 2, 2)) - 1))
-    self.DadSprite.TxtName = ((self.Dad < 21) and "male_"..self.Dad or "special_male_"..(tonumber(string.sub(Dad, 2, 2)) - 1))
+    self.MumSprite.TxtName = ((self.Mum < 21) and mumTxnPrefix..self.Mum or "special_"..mumTxnPrefix..(tonumber(string.sub(Mum, 2, 2)) - 1))
+    self.DadSprite.TxtName = ((self.Dad < 21) and dadTxnPrefix..self.Dad or "special_"..dadTxnPrefix..(tonumber(string.sub(Dad, 2, 2)) - 1))
 end
 
 function UIMenuHeritageWindow:Draw() -- required
