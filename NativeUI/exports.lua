@@ -47,7 +47,13 @@ exports('_setEventListener', function(target, event, eventName)
         end
 
         if event == 'OnMenuChanged' then
+            local eventLayers = targetTable[handleIndex(target, targetType)][event]
             targetTable[handleIndex(target, targetType)][event] = function(parent, menu, forward) 
+                -- Call existing event handlers first so they propagate in correct order.
+                if eventLayers ~= nil then
+                    eventLayers(parent, menu, forward)
+                end
+
                 local menuIndex = -1
                 for i=1,menuCount do
                     if menus[i] == menu then
@@ -184,40 +190,42 @@ exports("MenuListItem:RemovePanelAt", function(menuListItem, panelIndex)
     menuItems[handleIndex(menuListItem, "menuItem")]:RemovePanelAt(panelIndex)
 end)
 exports("MenuListItem:getPanelValue", function(panel)
-    print('getPanelValue')
     local panelObj = panels[handleIndex(panel, "panel")]
     if panelObj ~= nil and panelObj.CurrentSelection ~= nil then
-        print('colour')
         return panelObj:CurrentSelection()
     end
     if panelObj ~= nil and panelObj.Data ~= nil and panelObj.Data.Percentage ~= nil then
-        print('percentage2')
-        print(tostring(panelObj.Data.Percentage))
         if panelObj.ParentItem ~= nil then
             local PanelItemIndex = panelObj.ParentItem:FindPanelItem(panelObj)
-            -- if PanelItemIndex then 
-                -- print("panel " .. PanelItemIndex)
-                -- return panelObj.ParentItem.Items[PanelItemIndex].Value[panelObj.ParentItem:FindPanelIndex(panelObj)]
-            -- end
         end
         return panelObj.Data.Percentage
     end
 
     return nil
 end)
-exports("MenuListItem:setPanelValue", function(panel, value)
-    local panelObj = panels[handleIndex(panel, "panel")]
-    if panelObj ~= nil and panelObj.CurrentSelection ~= nil then
-        panelObj:CurrentSelection(value, false)
-    elseif panelObj ~= nil and panelObj.Percentage ~= nil then
-        panelObj.Data.Percentage = value 
-        -- Sync the active bar visually as well
-        panelObj.ActiveBar:Size(413 * ((value >= 0 and value <= 413) and value or ((value < 0) and 0 or 1)), panelObj.ActiveBar.Height)
-        panelObj:UpdateParent(value, false)
+exports("MenuListItem:setPanelValue", function(panelsToChange, valuesToSet)
+    if type(panelsToChange) ~= "table" then
+        panelsToChange = {panelsToChange}
+        valuesToSet = {valuesToSet}
+    end
+
+    for i=1,#panelsToChange do
+        local panel = panelsToChange[i]
+        local value = valuesToSet[i];
+
+        local panelObj = panels[handleIndex(panel, "panel")]
+        if panelObj ~= nil and panelObj.CurrentSelection ~= nil and panelObj.Percentage == nil then
+            panelObj:CurrentSelection(value, false)
+        end
+        if panelObj ~= nil and panelObj.Percentage ~= nil then
+            panelObj.Data.Percentage = value 
+            -- Sync the active bar visually as well
+            panelObj.ActiveBar:Size(413 * ((value >= 0 and value <= 413) and value or ((value < 0) and 0 or 1)), panelObj.ActiveBar.Height)
+            panelObj:UpdateParent(value, false)
+        end
     end
 end)
 exports("MenuListItem:setPanelEnabled", function(menuListItem, panelIndex, enabled)
-    print("calling menuItems[" .. handleIndex(menuListItem, "menuItem") .. "].Panels[" .. panelIndex .. "]:Enabled(" .. tostring(enabled) .. ")")
     local panel = menuItems[handleIndex(menuListItem, "menuItem")].Panels[panelIndex]
     if panel ~= nil then
         panel:Enabled(enabled)
