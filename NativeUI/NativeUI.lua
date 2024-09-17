@@ -1783,8 +1783,6 @@ end
 --]]
 
 function UIMenuHeritageWindow.New(Mum, Dad)
-    print(Mum .. type(Mum))
-    print(Dad .. type(Dad))
     local maleMum = false
     local femaleDad = false
     local mumsCount = 21
@@ -1804,11 +1802,6 @@ function UIMenuHeritageWindow.New(Mum, Dad)
         dadsCount = 21
         dadTxnPrefix = "female_"
     end
-
-    print("converted")
-
-    print(Mum .. type(Mum))
-    print(Dad .. type(Dad))
 
     if not tonumber(Mum) then Mum = 0 end
     if not (Mum >= 0 and Mum <= mumsCount) then Mum = 0 end
@@ -1856,8 +1849,6 @@ function UIMenuHeritageWindow:Position(Y) -- required
 end
 
 function UIMenuHeritageWindow:Index(Mum, Dad)
-    print(Mum .. type(Mum))
-    print(Dad .. type(Dad))
     local maleMum = false
     local femaleDad = false
     local mumsCount = 21
@@ -2357,11 +2348,6 @@ end
 
 function UIMenuPercentagePanel:UpdateParent(Percentage)
     local _, ParentType = self.ParentItem()
-    if Percentage ~= nil then
-        print('changing percentage!!!')
-        print(Percentage)
-        -- self.Data.Percentage = Percentage
-    end
     if ParentType == "UIMenuListItem" then
         local PanelItemIndex = self.ParentItem:FindPanelItem()
         if PanelItemIndex then
