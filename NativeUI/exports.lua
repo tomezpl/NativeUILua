@@ -12,6 +12,8 @@ windows = {}
 windowCount = 0
 panels = {}
 panelCount = 0
+instrButtons = {}
+instrButtonCount = 0
 
 function handleIndex(handle, kind)
     return tonumber(string.sub(handle, string.len(kind) + 1))
@@ -240,4 +242,15 @@ exports("MenuListItem:getProp", function(menuListItem, propName)
 end)
 exports("MenuListItem:setProp", function(menuListItem, propName, propValue)
     menuItems[handleIndex(menuListItem, "menuItem")][propName] = propValue
+end)
+exports("Menu:AddInstructionButton", function(menu, button, text)
+    local menu = menus[handleIndex(menu, "menu")]
+    local instrButton = {button, text}
+    table.insert(instrButtons, instrButton)
+    menu:AddInstructionButton(instrButton)
+    instrButtonCount = instrButtonCount + 1
+    return "instrButton" .. instrButtonCount
+end)
+exports("Menu:CurrentSelection", function(menu)
+    return menus[handleIndex(menu, "menu")]:CurrentSelection()
 end)
