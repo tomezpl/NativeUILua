@@ -2965,13 +2965,17 @@ function UIMenu:ProcessControl()
         end
     end
 
+    function isHoldingControl(pad, control)
+        return IsDisabledControlJustPressed(pad, control) ~= true and IsDisabledControlPressed(pad, control)
+    end
+
     if not self.LeftPressed then
-        if self.Controls.Left.Enabled and (IsDisabledControlPressed(0, 174) or IsDisabledControlPressed(1, 174) or IsDisabledControlPressed(2, 174)) then
+        if self.Controls.Left.Enabled and (IsDisabledControlJustPressed(0, 174) or IsDisabledControlJustPressed(1, 174) or IsDisabledControlJustPressed(2, 174)) then
             Citizen.CreateThread(function()
                 self.LeftPressed = true
                 self:GoLeft()
                 Citizen.Wait(175)
-                while self.Controls.Left.Enabled and (IsDisabledControlPressed(0, 174) or IsDisabledControlPressed(1, 174) or IsDisabledControlPressed(2, 174)) do
+                while self.Controls.Left.Enabled and (isHoldingControl(0, 174) or isHoldingControl(1, 174) or isHoldingControl(2, 174)) do
                     self:GoLeft()
                     Citizen.Wait(125)
                 end
@@ -2981,12 +2985,12 @@ function UIMenu:ProcessControl()
     end
 
     if not self.RightPressed then
-        if self.Controls.Right.Enabled and (IsDisabledControlPressed(0, 175) or IsDisabledControlPressed(1, 175) or IsDisabledControlPressed(2, 175)) then
+        if self.Controls.Right.Enabled and (IsDisabledControlJustPressed(0, 175) or IsDisabledControlJustPressed(1, 175) or IsDisabledControlJustPressed(2, 175)) then
             Citizen.CreateThread(function()
                 self.RightPressed = true
                 self:GoRight()
                 Citizen.Wait(175)
-                while self.Controls.Right.Enabled and (IsDisabledControlPressed(0, 175) or IsDisabledControlPressed(1, 175) or IsDisabledControlPressed(2, 175)) do
+                while self.Controls.Right.Enabled and (isHoldingControl(0, 175) or isHoldingControl(1, 175) or isHoldingControl(2, 175)) do
                     self:GoRight()
                     Citizen.Wait(125)
                 end
