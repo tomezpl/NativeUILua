@@ -152,6 +152,9 @@ exports("MenuPool:AddSubMenu", function (menuPool, parentMenu, ...)
     menuCount = menuCount + 1
     return "menu" .. menuCount
 end)
+exports("MenuPool:MouseEdgeEnabled", function (menuPool, enabled)
+    pools[handleIndex(menuPool, "menuPool")]:MouseEdgeEnabled(enabled)
+end)
 
 exports("Menu:Visible", function (menu, visible)
     menus[handleIndex(menu, "menu")]:Visible(visible)
