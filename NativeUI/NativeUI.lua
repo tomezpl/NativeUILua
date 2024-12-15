@@ -1783,14 +1783,34 @@ end
 --]]
 
 function UIMenuHeritageWindow.New(Mum, Dad)
+    local maleMum = false
+    local femaleDad = false
+    local mumsCount = 21
+    local dadsCount = 23
+    local dadTxnPrefix = "male_"
+    local mumTxnPrefix = "female_"
+
+    if type(Mum) == "string" and Mum:sub(1,1) == "-" then
+        Mum = tonumber(Mum) * -1
+        maleMum = true
+        mumsCount = 23
+        mumTxnPrefix = "male_"
+    end
+    if type(Dad) == "string" and Dad:sub(1,1) == "-" then
+        Dad = tonumber(Dad) * -1
+        femaleDad = true
+        dadsCount = 21
+        dadTxnPrefix = "female_"
+    end
+
     if not tonumber(Mum) then Mum = 0 end
-    if not (Mum >= 0 and Mum <= 21) then Mum = 0 end
+    if not (Mum >= 0 and Mum <= mumsCount) then Mum = 0 end
     if not tonumber(Dad) then Dad = 0 end
-    if not (Dad >= 0 and Dad <= 23) then Dad = 0 end
+    if not (Dad >= 0 and Dad <= dadsCount) then Dad = 0 end
     _UIMenuHeritageWindow = {
         Background = Sprite.New("pause_menu_pages_char_mom_dad", "mumdadbg", 0, 0, 431, 228), -- Background is required, must be a sprite or a rectangle.
-        MumSprite = Sprite.New("char_creator_portraits", ((Mum < 21) and "female_"..Mum or "special_female_"..(tonumber(string.sub(Mum, 2, 2)) - 1)), 0, 0, 228, 228),
-        DadSprite = Sprite.New("char_creator_portraits", ((Dad < 21) and "male_"..Dad or "special_male_"..(tonumber(string.sub(Dad, 2, 2)) - 1)), 0, 0, 228, 228),
+        MumSprite = Sprite.New("char_creator_portraits", ((Mum < 21) and mumTxnPrefix..Mum or "special_"..mumTxnPrefix..(tonumber(string.sub(Mum, 2, 2)) - 1)), 0, 0, 228, 228),
+        DadSprite = Sprite.New("char_creator_portraits", ((Dad < 21) and dadTxnPrefix..Dad or "special_"..dadTxnPrefix..(tonumber(string.sub(Dad, 2, 2)) - 1)), 0, 0, 228, 228),
         Mum = Mum,
         Dad = Dad,
         _Offset = {X = 0, Y = 0}, -- required
@@ -1829,16 +1849,36 @@ function UIMenuHeritageWindow:Position(Y) -- required
 end
 
 function UIMenuHeritageWindow:Index(Mum, Dad)
+    local maleMum = false
+    local femaleDad = false
+    local mumsCount = 21
+    local dadsCount = 23
+    local dadTxnPrefix = "male_"
+    local mumTxnPrefix = "female_"
+
+    if type(Mum) == "string" and Mum:sub(1,1) == "-" then
+        Mum = tonumber(Mum) * -1
+        maleMum = true
+        mumsCount = 23
+        mumTxnPrefix = "male_"
+    end
+    if type(Dad) == "string" and Dad:sub(1,1) == "-" then
+        Dad = tonumber(Dad) * -1
+        femaleDad = true
+        dadsCount = 21
+        dadTxnPrefix = "female_"
+    end
+
     if not tonumber(Mum) then Mum = self.Mum end
-    if not (Mum >= 0 and Mum <= 21) then Mum = self.Mum end
+    if not (Mum >= 0 and Mum <= mumsCount) then Mum = self.Mum end
     if not tonumber(Dad) then Dad = self.Dad end
-    if not (Dad >= 0 and Dad <= 23) then Dad = self.Dad end
+    if not (Dad >= 0 and Dad <= dadsCount) then Dad = self.Dad end
 
     self.Mum = Mum
     self.Dad = Dad
 
-    self.MumSprite.TxtName = ((self.Mum < 21) and "female_"..self.Mum or "special_female_"..(tonumber(string.sub(Mum, 2, 2)) - 1))
-    self.DadSprite.TxtName = ((self.Dad < 21) and "male_"..self.Dad or "special_male_"..(tonumber(string.sub(Dad, 2, 2)) - 1))
+    self.MumSprite.TxtName = ((self.Mum < 21) and mumTxnPrefix..self.Mum or "special_"..mumTxnPrefix..(tonumber(string.sub(Mum, 2, 2)) - 1))
+    self.DadSprite.TxtName = ((self.Dad < 21) and dadTxnPrefix..self.Dad or "special_"..dadTxnPrefix..(tonumber(string.sub(Dad, 2, 2)) - 1))
 end
 
 function UIMenuHeritageWindow:Draw() -- required
@@ -2245,6 +2285,7 @@ function UIMenuPercentagePanel.New(MinText, MaxText)
     _UIMenuPercentagePanel = {
         Data = {
             Enabled = true,
+            Percentage = 1.0
         },
         Background = Sprite.New("commonmenu", "gradient_bgd", 0, 0, 431, 76),
         ActiveBar = UIResRectangle.New(0, 0, 413, 10, 245, 245, 245, 255),
@@ -2292,6 +2333,7 @@ end
 function UIMenuPercentagePanel:Percentage(Value)
     if tonumber(Value) then
         local Percent = ((Value < 0.0) and 0.0) or ((Value > 1.0) and 1.0 or Value)
+        -- self.Data.Percentage = Percent
         self.ActiveBar:Size(self.BackgroundBar.Width * Percent, self.ActiveBar.Height)
     else
         local SafeZone = {X = 0, Y = 0}
@@ -2348,6 +2390,13 @@ function UIMenuPercentagePanel:Functions()
                     while IsDisabledControlPressed(0, 24) and IsMouseInBounds(self.BackgroundBar.X + SafeZone.X, self.BackgroundBar.Y - 4 + SafeZone.Y, self.BackgroundBar.Width, self.BackgroundBar.Height + 8) do
                         Citizen.Wait(0)
                         local Progress = (math.round(GetControlNormal(0, 239) * 1920) - SafeZone.X) - self.ActiveBar.X
+                        self.Data.Percentage = Progress/self.BackgroundBar.Width
+                        if self.Data.Percentage < 0 then
+                            self.Data.Percentage = 0.0
+                        end
+                        if self.Data.Percentage > 1 then
+                            self.Data.Percentage = 1.0
+                        end
                         self.ActiveBar:Size(((Progress >= 0 and Progress <= 413) and Progress or ((Progress < 0) and 0 or 413)), self.ActiveBar.Height)
                     end
                     StopSound(self.Audio.Id)
@@ -2916,13 +2965,17 @@ function UIMenu:ProcessControl()
         end
     end
 
+    function isHoldingControl(pad, control)
+        return IsDisabledControlJustPressed(pad, control) ~= true and IsDisabledControlPressed(pad, control)
+    end
+
     if not self.LeftPressed then
-        if self.Controls.Left.Enabled and (IsDisabledControlPressed(0, 174) or IsDisabledControlPressed(1, 174) or IsDisabledControlPressed(2, 174)) then
+        if self.Controls.Left.Enabled and (IsDisabledControlJustPressed(0, 174) or IsDisabledControlJustPressed(1, 174) or IsDisabledControlJustPressed(2, 174)) then
             Citizen.CreateThread(function()
                 self.LeftPressed = true
                 self:GoLeft()
                 Citizen.Wait(175)
-                while self.Controls.Left.Enabled and (IsDisabledControlPressed(0, 174) or IsDisabledControlPressed(1, 174) or IsDisabledControlPressed(2, 174)) do
+                while self.Controls.Left.Enabled and (isHoldingControl(0, 174) or isHoldingControl(1, 174) or isHoldingControl(2, 174)) do
                     self:GoLeft()
                     Citizen.Wait(125)
                 end
@@ -2932,12 +2985,12 @@ function UIMenu:ProcessControl()
     end
 
     if not self.RightPressed then
-        if self.Controls.Right.Enabled and (IsDisabledControlPressed(0, 175) or IsDisabledControlPressed(1, 175) or IsDisabledControlPressed(2, 175)) then
+        if self.Controls.Right.Enabled and (IsDisabledControlJustPressed(0, 175) or IsDisabledControlJustPressed(1, 175) or IsDisabledControlJustPressed(2, 175)) then
             Citizen.CreateThread(function()
                 self.RightPressed = true
                 self:GoRight()
                 Citizen.Wait(175)
-                while self.Controls.Right.Enabled and (IsDisabledControlPressed(0, 175) or IsDisabledControlPressed(1, 175) or IsDisabledControlPressed(2, 175)) do
+                while self.Controls.Right.Enabled and (isHoldingControl(0, 175) or isHoldingControl(1, 175) or isHoldingControl(2, 175)) do
                     self:GoRight()
                     Citizen.Wait(125)
                 end

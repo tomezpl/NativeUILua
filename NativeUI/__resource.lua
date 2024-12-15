@@ -30,3 +30,5 @@ client_scripts {
 --]]
 
 client_script "NativeUI.lua"
+client_script "exports.lua"
+exports "NativeUI"
