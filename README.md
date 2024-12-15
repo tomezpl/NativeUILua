@@ -1,3 +1,6 @@
+> [!WARNING]
+> This is a fork of [FrazzIe's NativeUILua](https://github.com/FrazzIe/NativeUILua), the original README of which can be found below. This fork merely adds very hacky exports to make this resource usable in JavaScript resources in order for me to be able to use it in [lbg-char-neo](https://github.com/tomezpl/lbg-char-neo). It is poor code and I strongly advise against using it in any production resources. Issues and PRs in this repo will be ignored.
+
 # NativeUI in LUA for FiveM.
 ![NativeUILua Example](https://i.gyazo.com/dbf3d6bed1f98fb765e5c8f25b504607.png)
 
